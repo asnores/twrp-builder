@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Clean Environment
       run: |
@@ -51,7 +51,7 @@ jobs:
         mka recoveryimage -j$(nproc)
 
     - name: Upload Finished TWRP File
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: TWRP_Recovery_Tecno_Camon_20_Pro
         path: ~/fox/out/target/product/TECNO-CK7n/OrangeFox*.img
