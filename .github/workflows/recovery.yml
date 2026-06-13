@@ -1,4 +1,4 @@
-name: Pure TWRP Recovery Builder
+name: Recovery Builder
 
 on:
   workflow_dispatch:
@@ -20,41 +20,41 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev python3 repo
 
-    - name: Initialize TWRP Source Directory
+    - name: Initialize Environment Variables
       run: |
-        # INAYOS: Ginamit ang $HOME para masigurong walang path expansion error ang Ubuntu runner
-        mkdir -p $HOME/twrp
+        mkdir -p $HOME/fox
         git config --global user.name "Builder"
         git config --global user.email "builder@email.com"
+        # Nilalagpasan ang nakakaritong github repo sync bug
         git config --global --unset http.https://github.com
 
     - name: Repo Init
       run: |
-        cd $HOME/twrp
-        # Pinaghiwalay ang utos upang masuri nang maayos ng GitHub compiler ang repo handshake
-        repo init --depth=1 -u https://github.com -b twrp-12.1 --no-clone-bundle
+        cd $HOME/fox
+        # Ibinalik sa tamang OrangeFox manifest kung saan tugma ang Tecno Camon 20 Pro tree mo
+        repo init --depth=1 -u https://gitlab.com -b fox_12.1 --no-clone-bundle
 
     - name: Repo Sync Source Code
       run: |
-        cd $HOME/twrp
-        # Safe parallel sync module download para sa Tecno Camon 20 Pro layout code
+        cd $HOME/fox
+        # Optimized network handshake sync loop para iwas timeout fail
         repo sync -c -j$(nproc) --force-sync --no-clone-bundle --no-tags || repo sync -c -j2 --force-sync --no-clone-bundle --no-tags
 
     - name: Clone Your Device Tree
       run: |
-        mkdir -p $HOME/twrp/device/tecno/TECNO-CK7n
-        git clone https://github.com -b fox_12.1 $HOME/twrp/device/tecno/TECNO-CK7n
+        mkdir -p $HOME/fox/device/tecno/TECNO-CK7n
+        git clone https://github.com -b fox_12.1 $HOME/fox/device/tecno/TECNO-CK7n
 
-    - name: Start Building TWRP Recovery Image
+    - name: Start Building OrangeFox Image
       run: |
-        cd $HOME/twrp
+        cd $HOME/fox
         . build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         lunch twrp_TECNO-CK7n-eng || lunch omni_TECNO-CK7n-eng
         mka recoveryimage -j$(nproc)
 
-    - name: Upload Finished TWRP File
+    - name: Upload Finished Recovery File
       uses: actions/upload-artifact@v4
       with:
-        name: Pure_TWRP_Recovery_Tecno_Camon_20_Pro
-        path: /home/runner/twrp/out/target/product/TECNO-CK7n/recovery.img
+        name: OrangeFox_Recovery_Tecno_Camon_20_Pro
+        path: /home/runner/fox/out/target/product/TECNO-CK7n/OrangeFox*.img
