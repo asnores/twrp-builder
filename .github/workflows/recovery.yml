@@ -22,8 +22,9 @@ jobs:
 
     - name: Install Repo Tool
       run: |
-        mkdir ~/bin
-        curl https://googleapis.com > ~/bin/repo
+        mkdir -p ~/bin
+        # INAYOS: Ginamit ang opisyal na raw GitHub source bootstrap link ng Google Repo team
+        curl https://githubusercontent.com > ~/bin/repo
         chmod a+x ~/bin/repo
         export PATH=~/bin:$PATH
 
@@ -54,4 +55,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: TWRP_Recovery_Tecno_Camon_20_Pro
-        path: ~/fox/out/target/product/TECNO-CK7n/OrangeFox*.img
+        path: ~/fox/out/target/product/TECNO-CK&n/OrangeFox*.img
