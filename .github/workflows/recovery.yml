@@ -15,27 +15,23 @@ jobs:
         sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php
         sudo apt-get clean
         
-    - name: Install Build Dependencies
+    - name: Install Build Dependencies & Repo Tool
       run: |
         sudo apt-get update
-        sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev python3
-
-    - name: Install Repo Tool
-      run: |
-        mkdir -p ~/bin
-        # INAYOS: Ginamit ang opisyal na raw GitHub source bootstrap link ng Google Repo team
-        curl https://githubusercontent.com > ~/bin/repo
-        chmod a+x ~/bin/repo
-        export PATH=~/bin:$PATH
+        # Idinagdag ang 'repo' direktang package para hindi na mag-download gamit ang curl
+        sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev python3 repo
 
     - name: Initialize Fox/TWRP Source Sync
       run: |
-        export PATH=~/bin:$PATH
         mkdir ~/fox && cd ~/fox
         git config --global user.name "Builder"
         git config --global user.email "builder@email.com"
-        repo init --depth=1 -u https://gitlab.com -b fox_12.1
-        repo sync -j$(nproc) --force-sync
+        
+        # Gumamit ng opisyal na manifest setup ng OrangeFox Project
+        repo init --depth=1 -u https://gitlab.com -b fox_12.1 --no-clone-bundle
+        
+        # Safe parallel syncing para sa Tecno Camon 20 Pro tree compilation
+        repo sync -c -j$(nproc) --force-sync --no-clone-bundle --no-tags || repo sync -c -j2 --force-sync --no-clone-bundle --no-tags
 
     - name: Clone Your Device Tree
       run: |
@@ -44,7 +40,6 @@ jobs:
 
     - name: Start Building Recovery Image
       run: |
-        export PATH=~/bin:$PATH
         cd ~/fox
         . build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
@@ -55,4 +50,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: TWRP_Recovery_Tecno_Camon_20_Pro
-        path: ~/fox/out/target/product/TECNO-CK&n/OrangeFox*.img
+        path: ~/fox/out/target/product/TECNO-CK7n/OrangeFox*.img
