@@ -26,7 +26,9 @@ jobs:
         git config --global user.name "Builder"
         git config --global user.email "builder@email.com"
         
-        # INAYOS: Pinalitan ng Opisyal na Minimal TWRP Manifest para sa Android 12.1/14 compilation
+        # INAYOS AT PINALAKAS: Sapilitang tinanggal ang mapanirang Git config header na umaakit sa fatal repository crash bug
+        git config --global --unset http.https://github.com
+        
         repo init --depth=1 -u https://github.com -b twrp-12.1 --no-clone-bundle
         repo sync -c -j$(nproc) --force-sync --no-clone-bundle --no-tags || repo sync -c -j2 --force-sync --no-clone-bundle --no-tags
 
