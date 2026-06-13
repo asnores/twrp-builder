@@ -1,4 +1,4 @@
-name: Recovery Builder
+name: Pure TWRP Recovery Builder
 
 on:
   workflow_dispatch:
@@ -20,23 +20,24 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32readline-dev lib32z1-dev liblz4-tool libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev python3 repo
 
-    - name: Initialize Fox/TWRP Source Sync
+    - name: Initialize Pure TWRP Source Sync
       run: |
-        mkdir ~/fox && cd ~/fox
+        mkdir ~/twrp && cd ~/twrp
         git config --global user.name "Builder"
         git config --global user.email "builder@email.com"
         
-        repo init --depth=1 -u https://gitlab.com -b fox_12.1 --no-clone-bundle
+        # INAYOS: Pinalitan ng Opisyal na Minimal TWRP Manifest para sa Android 12.1/14 compilation
+        repo init --depth=1 -u https://github.com -b twrp-12.1 --no-clone-bundle
         repo sync -c -j$(nproc) --force-sync --no-clone-bundle --no-tags || repo sync -c -j2 --force-sync --no-clone-bundle --no-tags
 
     - name: Clone Your Device Tree
       run: |
-        mkdir -p ~/fox/device/tecno/TECNO-CK7n
-        git clone https://github.com -b fox_12.1 ~/fox/device/tecno/TECNO-CK7n
+        mkdir -p ~/twrp/device/tecno/TECNO-CK7n
+        git clone https://github.com -b fox_12.1 ~/twrp/device/tecno/TECNO-CK7n
 
-    - name: Start Building Recovery Image
+    - name: Start Building TWRP Recovery Image
       run: |
-        cd ~/fox
+        cd ~/twrp
         . build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         lunch twrp_TECNO-CK7n-eng || lunch omni_TECNO-CK7n-eng
@@ -45,5 +46,5 @@ jobs:
     - name: Upload Finished TWRP File
       uses: actions/upload-artifact@v4
       with:
-        name: TWRP_Recovery_Tecno_Camon_20_Pro
-        path: ~/fox/out/target/product/TECNO-CK7n/OrangeFox*.img
+        name: Pure_TWRP_Recovery_Tecno_Camon_20_Pro
+        path: ~/twrp/out/target/product/TECNO-CK7n/recovery.img
